@@ -1,0 +1,42 @@
+{
+  "title": "Scambio sul Posto estimate",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Scambio sul Posto estimate",
+        "description": "Choose two yearly Utility Meter helpers for the same period. Financial assumptions are optional: leave unknown values empty. This is an estimate, not the official GSE settlement.",
+        "data": {
+          "name": "Name",
+          "import_energy": "YEARLY imported energy counter",
+          "export_energy": "YEARLY exported energy counter",
+          "zone": "Market zone",
+          "reference_year": "Reference year",
+          "pun_average": "Import-weighted PUN average (EUR/kWh)",
+          "zonal_average": "Export-weighted zonal price average (EUR/kWh)",
+          "cusf": "Reference CUSf (EUR/kWh)",
+          "rate_reference": "Parameter source, period and assumptions"
+        }
+      }
+    },
+    "error": {
+      "same_sensor": "Choose two distinct energy counters.",
+      "invalid_energy": "Choose an available Wh, kWh or MWh energy sensor."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Scambio sul Posto estimate",
+        "description": "Choose two yearly Utility Meter helpers for the same period. Financial assumptions are optional: leave unknown values empty. This is an estimate, not the official GSE settlement.",
+        "data": {
+          "zone": "Market zone",
+          "reference_year": "Reference year",
+          "pun_average": "Import-weighted PUN average (EUR/kWh)",
+          "zonal_average": "Export-weighted zonal price average (EUR/kWh)",
+          "cusf": "Reference CUSf (EUR/kWh)",
+          "rate_reference": "Parameter source, period and assumptions"
+        }
+      }
+    }
+  }
+}

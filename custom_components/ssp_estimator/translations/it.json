@@ -1,0 +1,42 @@
+{
+  "title": "Stima Scambio sul Posto",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Stima Scambio sul Posto",
+        "description": "Scegli due Utility Meter annuali dello stesso periodo. I parametri economici sono facoltativi: se sconosciuti, gli importi resteranno indisponibili. Si tratta di una stima, non del conguaglio GSE.",
+        "data": {
+          "name": "Nome",
+          "import_energy": "Contatore ANNUALE energia prelevata",
+          "export_energy": "Contatore ANNUALE energia immessa",
+          "zone": "Zona di mercato",
+          "reference_year": "Anno di riferimento",
+          "pun_average": "PUN medio ponderato sui prelievi (€/kWh)",
+          "zonal_average": "Prezzo zonale medio ponderato sulle immissioni (€/kWh)",
+          "cusf": "CUSf di riferimento (€/kWh)",
+          "rate_reference": "Fonte, periodo e ipotesi dei parametri"
+        }
+      }
+    },
+    "error": {
+      "same_sensor": "Scegli due contatori distinti.",
+      "invalid_energy": "Scegli un sensore disponibile con energia in Wh, kWh o MWh."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Stima Scambio sul Posto",
+        "description": "Scegli due Utility Meter annuali dello stesso periodo. I parametri economici sono facoltativi: se sconosciuti, gli importi resteranno indisponibili. Si tratta di una stima, non del conguaglio GSE.",
+        "data": {
+          "zone": "Zona di mercato",
+          "reference_year": "Anno di riferimento",
+          "pun_average": "PUN medio ponderato sui prelievi (€/kWh)",
+          "zonal_average": "Prezzo zonale medio ponderato sulle immissioni (€/kWh)",
+          "cusf": "CUSf di riferimento (€/kWh)",
+          "rate_reference": "Fonte, periodo e ipotesi dei parametri"
+        }
+      }
+    }
+  }
+}
