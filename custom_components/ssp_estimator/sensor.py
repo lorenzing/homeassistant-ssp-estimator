@@ -1,18 +1,16 @@
 """Local annual SSP estimates, reacting to changes of the two energy counters."""
 
-from datetime import datetime
-
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.event import async_track_state_change_event, async_track_time_change
-from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 
-from .calculation import energy_kwh, estimate
+from .calculation import estimate, number
 from .const import DOMAIN, EXPORT, IMPORT, RATES
+from .period import InvalidCounter, read_counter
 
 DESCRIPTIONS = (
     ("exchanged_kwh", "Energia scambiata nel periodo", "kWh"),
@@ -27,7 +25,13 @@ DESCRIPTIONS = (
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback) -> None:
-    async_add_entities(SSPSensor(entry, key, name, unit) for key, name, unit in DESCRIPTIONS)
+    from .market_sensor import MARKET_SENSORS, MarketSensor
+
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    async_add_entities([
+        *(SSPSensor(entry, key, name, unit) for key, name, unit in DESCRIPTIONS),
+        *(MarketSensor(coordinator, entry, key, name) for key, name in MARKET_SENSORS),
+    ])
 
 
 class SSPSensor(SensorEntity):
@@ -60,51 +64,39 @@ class SSPSensor(SensorEntity):
 
     def _result(self):
         config = self.entry.options or self.entry.data
-        if int(config.get("reference_year", 0)) != dt_util.now().year:
+        now = dt_util.now()
+        try:
+            year = number(config.get("reference_year"))
+        except ValueError:
+            year = None
+        if year != now.year:
             return "reference_year_outdated", None, {}
         energies = []
         coverage = {}
         periods = []
         for key in (IMPORT, EXPORT):
-            state = self.hass.states.get(self.entry.data[key])
             try:
-                registry_entry = er.async_get(self.hass).async_get(self.entry.data[key])
-                source_entry = self.hass.config_entries.async_get_entry(registry_entry.config_entry_id) if registry_entry else None
-                if source_entry is None or source_entry.domain != "utility_meter" or source_entry.options.get("cycle") != "yearly":
-                    return "annual_counters_required", None, coverage
-                if state is None:
-                    raise ValueError
-                energies.append(energy_kwh(state.state, state.attributes.get("unit_of_measurement")))
-                # Yearly Utility Meter exposes next_reset on January 1.
-                # Reject known monthly/day counters and stale previous-year data.
-                for attribute in ("last_reset", "next_reset"):
-                    raw = state.attributes.get(attribute)
-                    coverage[f"{key}_{attribute}"] = raw
-                start_raw = state.attributes.get("last_reset")
-                end_raw = state.attributes.get("next_reset")
-                if not start_raw or not end_raw:
-                    return "annual_counters_required", None, coverage
-                start = dt_util.as_local(datetime.fromisoformat(str(start_raw)))
-                end = dt_util.as_local(datetime.fromisoformat(str(end_raw)))
-                year = dt_util.now().year
-                if start.year != year or (end.year, end.month, end.day) != (year + 1, 1, 1):
-                    return "annual_counters_required", None, coverage
+                energy, start, end = read_counter(self.hass, self.entry.data[key], now)
+                energies.append(energy)
+                coverage[f"{key}_last_reset"] = start.isoformat()
+                coverage[f"{key}_next_reset"] = end.isoformat()
                 periods.append(start)
-            except (ValueError, TypeError, OverflowError):
-                return "energy_unavailable", None, coverage
+            except InvalidCounter as err:
+                return str(err), None, coverage
         # Creation timestamps can differ slightly; reject material mismatches.
         if abs((periods[0] - periods[1]).total_seconds()) > 300:
             return "periods_do_not_match", None, coverage
         coverage["exchanged_kwh"] = min(energies)
         if any(key not in config for key in RATES):
             return "rates_required", None, coverage
-        if not config.get("rate_reference", "").strip():
+        if not str(config.get("rate_reference") or "").strip():
             return "rate_reference_required", None, coverage
         try:
             result = estimate(*energies, *(config[key] for key in RATES))
         except ValueError:
             return "invalid_rates", None, coverage
-        partial = any((value.month, value.day) != (1, 1) or value.hour != 0 for value in periods)
+        year_start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        partial = any(value != year_start for value in periods)
         return "partial_year_estimate" if partial else "annual_estimate", result, coverage
 
     @property
@@ -125,5 +117,6 @@ class SSPSensor(SensorEntity):
         status, _, coverage = self._result()
         return {"estimated": True, "method": "annual_weighted_average_scenario", "status": status,
                 "reference_year": config.get("reference_year"), "zone": config.get("zone"),
+                "province": config.get("province"),
                 "rate_reference": config.get("rate_reference", ""),
                 "not_an_official_gse_statement": True, **coverage}

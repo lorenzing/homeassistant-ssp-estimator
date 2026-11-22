@@ -4,39 +4,51 @@
     "step": {
       "user": {
         "title": "Stima Scambio sul Posto",
-        "description": "Scegli due Utility Meter annuali dello stesso periodo. I parametri economici sono facoltativi: se sconosciuti, gli importi resteranno indisponibili. Si tratta di una stima, non del conguaglio GSE.",
+        "description": "Scegli due Utility Meter annuali dello stesso periodo. I parametri economici sono facoltativi: se sconosciuti, gli importi resteranno indisponibili. Si tratta di una stima, non del conguaglio GSE. La zona di mercato è determinata dalla provincia selezionata.",
         "data": {
           "name": "Nome",
           "import_energy": "Contatore ANNUALE energia prelevata",
           "export_energy": "Contatore ANNUALE energia immessa",
-          "zone": "Zona di mercato",
           "reference_year": "Anno di riferimento",
           "pun_average": "PUN medio ponderato sui prelievi (€/kWh)",
           "zonal_average": "Prezzo zonale medio ponderato sulle immissioni (€/kWh)",
           "cusf": "CUSf di riferimento (€/kWh)",
-          "rate_reference": "Fonte, periodo e ipotesi dei parametri"
+          "rate_reference": "Fonte, periodo e ipotesi dei parametri",
+          "province": "Provincia dell'impianto (zona di mercato automatica)"
         }
       }
     },
     "error": {
       "same_sensor": "Scegli due contatori distinti.",
-      "invalid_energy": "Scegli un sensore disponibile con energia in Wh, kWh o MWh."
+      "invalid_energy": "Scegli un sensore disponibile con energia in Wh, kWh o MWh.",
+      "invalid_province": "Scegli una provincia dall'elenco.",
+      "annual_counters_required": "Scegli un Utility Meter annuale senza fasce e senza consumo netto, con periodo valido nell'anno corrente.",
+      "counter_paused": "Il contatore è in pausa. Riprendi il conteggio prima di configurare la stima.",
+      "periods_do_not_match": "I due contatori devono coprire lo stesso periodo (tolleranza di cinque minuti)."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Stima Scambio sul Posto",
-        "description": "Scegli due Utility Meter annuali dello stesso periodo. I parametri economici sono facoltativi: se sconosciuti, gli importi resteranno indisponibili. Si tratta di una stima, non del conguaglio GSE.",
+        "description": "Scegli due Utility Meter annuali dello stesso periodo. I parametri economici sono facoltativi: se sconosciuti, gli importi resteranno indisponibili. Si tratta di una stima, non del conguaglio GSE. La zona di mercato è determinata dalla provincia selezionata.",
         "data": {
-          "zone": "Zona di mercato",
           "reference_year": "Anno di riferimento",
           "pun_average": "PUN medio ponderato sui prelievi (€/kWh)",
           "zonal_average": "Prezzo zonale medio ponderato sulle immissioni (€/kWh)",
           "cusf": "CUSf di riferimento (€/kWh)",
-          "rate_reference": "Fonte, periodo e ipotesi dei parametri"
+          "rate_reference": "Fonte, periodo e ipotesi dei parametri",
+          "province": "Provincia dell'impianto (zona di mercato automatica)"
         }
       }
+    },
+    "error": {
+      "same_sensor": "Scegli due contatori distinti.",
+      "invalid_energy": "Scegli un sensore disponibile con energia in Wh, kWh o MWh.",
+      "invalid_province": "Scegli una provincia dall'elenco.",
+      "annual_counters_required": "Scegli un Utility Meter annuale senza fasce e senza consumo netto, con periodo valido nell'anno corrente.",
+      "counter_paused": "Il contatore è in pausa. Riprendi il conteggio prima di configurare la stima.",
+      "periods_do_not_match": "I due contatori devono coprire lo stesso periodo (tolleranza di cinque minuti)."
     }
   }
 }

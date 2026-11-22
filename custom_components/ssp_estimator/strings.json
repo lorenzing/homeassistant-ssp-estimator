@@ -4,39 +4,51 @@
     "step": {
       "user": {
         "title": "Scambio sul Posto estimate",
-        "description": "Choose two yearly Utility Meter helpers for the same period. Financial assumptions are optional: leave unknown values empty. This is an estimate, not the official GSE settlement.",
+        "description": "Choose two yearly Utility Meter helpers for the same period. Financial assumptions are optional: leave unknown values empty. This is an estimate, not the official GSE settlement. The market zone is determined by the selected province.",
         "data": {
           "name": "Name",
           "import_energy": "YEARLY imported energy counter",
           "export_energy": "YEARLY exported energy counter",
-          "zone": "Market zone",
           "reference_year": "Reference year",
           "pun_average": "Import-weighted PUN average (EUR/kWh)",
           "zonal_average": "Export-weighted zonal price average (EUR/kWh)",
           "cusf": "Reference CUSf (EUR/kWh)",
-          "rate_reference": "Parameter source, period and assumptions"
+          "rate_reference": "Parameter source, period and assumptions",
+          "province": "Installation province (automatic market zone)"
         }
       }
     },
     "error": {
       "same_sensor": "Choose two distinct energy counters.",
-      "invalid_energy": "Choose an available Wh, kWh or MWh energy sensor."
+      "invalid_energy": "Choose an available Wh, kWh or MWh energy sensor.",
+      "invalid_province": "Choose a province from the list.",
+      "annual_counters_required": "Choose a yearly Utility Meter without tariffs or net consumption and with a valid current-year period.",
+      "counter_paused": "The counter is paused. Resume collection before configuring the estimate.",
+      "periods_do_not_match": "Both counters must cover the same period (five-minute tolerance)."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Scambio sul Posto estimate",
-        "description": "Choose two yearly Utility Meter helpers for the same period. Financial assumptions are optional: leave unknown values empty. This is an estimate, not the official GSE settlement.",
+        "description": "Choose two yearly Utility Meter helpers for the same period. Financial assumptions are optional: leave unknown values empty. This is an estimate, not the official GSE settlement. The market zone is determined by the selected province.",
         "data": {
-          "zone": "Market zone",
           "reference_year": "Reference year",
           "pun_average": "Import-weighted PUN average (EUR/kWh)",
           "zonal_average": "Export-weighted zonal price average (EUR/kWh)",
           "cusf": "Reference CUSf (EUR/kWh)",
-          "rate_reference": "Parameter source, period and assumptions"
+          "rate_reference": "Parameter source, period and assumptions",
+          "province": "Installation province (automatic market zone)"
         }
       }
+    },
+    "error": {
+      "same_sensor": "Choose two distinct energy counters.",
+      "invalid_energy": "Choose an available Wh, kWh or MWh energy sensor.",
+      "invalid_province": "Choose a province from the list.",
+      "annual_counters_required": "Choose a yearly Utility Meter without tariffs or net consumption and with a valid current-year period.",
+      "counter_paused": "The counter is paused. Resume collection before configuring the estimate.",
+      "periods_do_not_match": "Both counters must cover the same period (five-minute tolerance)."
     }
   }
 }

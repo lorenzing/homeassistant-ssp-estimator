@@ -22,8 +22,17 @@ for language, title, fields, errors, description in (
     }, {"same_sensor": "Choose two distinct energy counters.", "invalid_energy": "Choose an available Wh, kWh or MWh energy sensor."},
      "Choose two yearly Utility Meter helpers for the same period. Financial assumptions are optional: leave unknown values empty. This is an estimate, not the official GSE settlement."),
 ):
+    errors.update({
+        "invalid_province": "Scegli una provincia dall'elenco." if language == "it" else "Choose a province from the list.",
+        "annual_counters_required": "Scegli un Utility Meter annuale senza fasce e senza consumo netto, con periodo valido nell'anno corrente." if language == "it" else "Choose a yearly Utility Meter without tariffs or net consumption and with a valid current-year period.",
+        "counter_paused": "Il contatore è in pausa. Riprendi il conteggio prima di configurare la stima." if language == "it" else "The counter is paused. Resume collection before configuring the estimate.",
+        "periods_do_not_match": "I due contatori devono coprire lo stesso periodo (tolleranza di cinque minuti)." if language == "it" else "Both counters must cover the same period (five-minute tolerance).",
+    })
+    fields.pop("zone")
+    fields["province"] = "Provincia dell'impianto (zona di mercato automatica)" if language == "it" else "Installation province (automatic market zone)"
+    description += " La zona di mercato è determinata dalla provincia selezionata." if language == "it" else " The market zone is determined by the selected province."
     value = {"title": title, "config": {"step": {"user": {"title": title, "description": description, "data": fields}}, "error": errors},
-             "options": {"step": {"init": {"title": title, "description": description, "data": {key: text for key, text in fields.items() if key not in ("name", "import_energy", "export_energy")}}}}}
+             "options": {"step": {"init": {"title": title, "description": description, "data": {key: text for key, text in fields.items() if key not in ("name", "import_energy", "export_energy")}}}, "error": errors}}
     path = root / "translations" / f"{language}.json"
     path.parent.mkdir(exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

@@ -25,7 +25,7 @@ def load_adapter():
     modules["homeassistant.helpers.entity_platform"].AddConfigEntryEntitiesCallback = object
     modules["homeassistant.helpers.event"].async_track_state_change_event = lambda *args: lambda: None
     modules["homeassistant.helpers.event"].async_track_time_change = lambda *args, **kwargs: lambda: None
-    modules["homeassistant.util.dt"].now = lambda: datetime(2026, 11, 10, tzinfo=timezone(timedelta(hours=1)))
+    modules["homeassistant.util.dt"].now = lambda: datetime(2026, 11, 10, 12, tzinfo=timezone(timedelta(hours=1)))
     modules["homeassistant.util.dt"].as_local = lambda value: value
     previous = {name: sys.modules.get(name) for name in modules}
     sys.modules.update(modules)
@@ -102,6 +102,66 @@ class SensorTests(unittest.TestCase):
         for state in self.states.values():
             state.attributes["last_reset"] = "2026-11-10T09:00:00+01:00"
         self.assertEqual(self.sensor._result()[0], "partial_year_estimate")
+
+    def test_reset_seconds_after_new_year_is_partial(self):
+        for state in self.states.values():
+            state.attributes["last_reset"] = "2026-01-01T00:00:01+01:00"
+        self.assertEqual(self.sensor._result()[0], "partial_year_estimate")
+
+    def test_invalid_period_boundaries(self):
+        for attribute, value in (
+            ("last_reset", "2026-11-11T00:00:00+01:00"),
+            ("last_reset", "2026-01-01T00:00:00"),
+            ("last_reset", "invalid"),
+            ("next_reset", "2027-01-01T12:00:00+01:00"),
+            ("next_reset", "2027-01-01T00:00:00"),
+        ):
+            with self.subTest(attribute=attribute, value=value):
+                self.setUp()
+                self.states["sensor.import"].attributes[attribute] = value
+                self.assertEqual(self.sensor._result()[0], "annual_counters_required")
+
+    def test_paused_counter_rejected(self):
+        self.states["sensor.import"].attributes["status"] = "paused"
+        self.assertEqual(self.sensor._result()[0], "counter_paused")
+        self.assertFalse(self.sensor.available)
+
+    def test_paused_counter_recovers(self):
+        self.states["sensor.import"].attributes["status"] = "paused"
+        self.assertFalse(self.sensor.available)
+        self.states["sensor.import"].attributes["status"] = "collecting"
+        self.assertEqual(self.sensor.native_value, 320)
+
+    def test_period_alignment_tolerance(self):
+        self.states["sensor.import"].attributes["last_reset"] = "2026-11-10T09:00:00+01:00"
+        self.states["sensor.export"].attributes["last_reset"] = "2026-11-10T09:05:00+01:00"
+        self.assertEqual(self.sensor._result()[0], "partial_year_estimate")
+        self.states["sensor.export"].attributes["last_reset"] = "2026-11-10T09:05:01+01:00"
+        self.assertEqual(self.sensor._result()[0], "periods_do_not_match")
+
+    def test_utc_and_local_boundaries_are_equivalent(self):
+        self.states["sensor.export"].attributes["last_reset"] = "2025-12-31T23:00:00+00:00"
+        self.states["sensor.export"].attributes["next_reset"] = "2026-12-31T23:00:00+00:00"
+        local = timezone(timedelta(hours=1))
+        original = adapter.dt_util.as_local
+        try:
+            adapter.dt_util.as_local = lambda value: value.astimezone(local)
+            self.assertEqual(self.sensor._result()[0], "annual_estimate")
+        finally:
+            adapter.dt_util.as_local = original
+
+    def test_tariff_and_net_meters_rejected(self):
+        for options in ({"tariffs": ["peak", "offpeak"]}, {"net_consumption": True}):
+            with self.subTest(options=options):
+                self.setUp()
+                self.source_options.update(options)
+                self.assertEqual(self.sensor._result()[0], "annual_counters_required")
+
+    def test_invalid_reference_year_does_not_crash_sensor(self):
+        for year in (None, "invalid", float("inf"), 2026.5, True):
+            with self.subTest(year=year):
+                self.options["reference_year"] = year
+                self.assertEqual(self.sensor._result()[0], "reference_year_outdated")
 
     def test_mismatched_periods_rejected(self):
         self.states["sensor.export"].attributes["last_reset"] = "2026-11-10T09:00:00+01:00"

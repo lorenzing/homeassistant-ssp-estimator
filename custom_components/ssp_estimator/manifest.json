@@ -6,7 +6,7 @@
   "documentation": "https://github.com/lorenzing/homeassistant-ssp-estimator",
   "issue_tracker": "https://github.com/lorenzing/homeassistant-ssp-estimator/issues",
   "integration_type": "helper",
-  "iot_class": "calculated",
+  "iot_class": "cloud_polling",
   "requirements": [],
-  "version": "0.1.0"
+  "version": "0.2.0"
 }

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0 — prerelease
+
+- Prezzi PUN e zonali reali GME del quarto d'ora corrente e medie giornaliere.
+- Download automatico orario con date di validità e gestione dei cambi d'ora.
+- Menu province con 110 territori e assegnazione automatica della zona di mercato.
+- Correzione del modulo iniziale: prezzi con precisione libera compatibili con i selettori Home Assistant.
+- Verifica CI del modulo con i selettori reali di Home Assistant 2026.11.2.
+
+- Controlli condivisi fra configurazione iniziale e aggiornamento dei sensori.
+- Rifiuto di contatori in pausa, con fasce o consumo netto e periodi non validi.
+- Verifica dei fusi orari, degli inizi futuri e dell'ora esatta del reset annuale.
+- Copertura parziale riconosciuta anche per reset pochi secondi dopo Capodanno.
+- Anni non validi gestiti senza interrompere l'aggiornamento dei sensori.
+- Messaggi di errore della configurazione in italiano e inglese.
+
 ## 0.1.0 — prerelease in preparazione
 
 - Configurazione e modifica delle ipotesi dall'interfaccia di Home Assistant.

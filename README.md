@@ -1,6 +1,6 @@
 # Scambio sul Posto — Stima GSE per Home Assistant
 
-Integrazione locale configurabile dall'interfaccia, pensata per HACS. Calcola uno
+Integrazione configurabile dall'interfaccia, pensata per HACS. Calcola uno
 **scenario annuale stimato** del contributo SSP e dell'eccedenza economica. Non
 accede al conto GSE e non recupera pagamenti o conguagli ufficiali.
 
@@ -21,8 +21,34 @@ PUN e prezzo zonale sono medie ponderate distinte, riferite allo stesso periodo
 dei contatori. La tariffa pagata al fornitore, comprensiva di imposte e oneri,
 non è il PUN. Il CUSf non è semplicemente la somma delle componenti della bolletta.
 
-La zona, selezionabile, è un'informazione di riferimento: non effettua download
-automatici dei prezzi. L'Emilia-Romagna appartiene alla zona NORD.
+Nel setup si sceglie la **provincia dell'impianto** da un menu a tendina con
+110 territori provinciali, comprese le nuove province sarde. Ogni voce mostra
+la zona corrispondente, per esempio **Ferrara · NORD**, **Firenze · CNOR** e
+**Napoli · CSUD**. La zona viene ricavata automaticamente anche modificando
+la provincia da Configura. Le configurazioni precedenti conservano la zona;
+al primo salvataggio delle opzioni occorre selezionare la provincia.
+
+## Prezzi reali GME
+
+L'integrazione scarica gli archivi pubblici MGP del GME per oggi e domani,
+senza account, e crea quattro entità in **EUR/kWh**:
+
+- **PUN puntuale**: prezzo del quarto d'ora corrente.
+- **Prezzo zonale puntuale**: prezzo del quarto d'ora per la zona della provincia.
+- **PUN medio giornaliero**: media aritmetica dei prezzi del giorno.
+- **Prezzo zonale medio giornaliero**: media aritmetica nella zona selezionata.
+
+Il download avviene ogni ora; il prezzo puntuale cambia localmente a ogni
+quarto d'ora. Gli attributi espongono fonte, zona, data di mercato, intervallo
+di validità e ultimo download. I giorni di cambio dell'ora hanno 92 o 100
+quarti d'ora. Mancanze e errori non vengono sostituiti da prezzi inventati o
+da quelli del giorno precedente; le medie richiedono il giorno completo.
+
+Questi prezzi **non sostituiscono automaticamente le medie ponderate annuali**:
+per calcolare OE e CEI del periodo occorre ponderarli sui rispettivi flussi.
+Il CUSf resta un parametro distinto da inserire con fonte e anno coerenti;
+non è un prezzo di borsa e non viene ricavato dal PUN. Il calcolo annuale
+rimane disponibile con i parametri inseriti anche se il download GME fallisce.
 
 ### Limiti del modello
 
@@ -60,13 +86,17 @@ L'inclusione nel catalogo HACS richiede una richiesta e una verifica separate.
    l'opzione "Periodicamente azzerato". Creare entrambi nello stesso momento.
 5. Aggiungere l'integrazione **Scambio sul Posto — Stima GSE** e scegliere i due
    nuovi contatori annuali. Non selezionare i totali vita dell'inverter.
-6. Impostare anno, zona, medie PUN/prezzo zonale e CUSf, con la fonte e il periodo
+6. Scegliere la provincia; impostare anno, medie PUN/prezzo zonale e CUSf, con fonte e periodo
    nel campo riferimento. Lasciare i valori economici non compilati se sconosciuti.
 7. Aggiornare le ipotesi da **Configura** nell'integrazione.
 
 Gli aiutanti annuali devono esporre `last_reset` nell'anno corrente e `next_reset`
 il 1° gennaio successivo. Contatori giornalieri/mensili o periodi disallineati sono
-rifiutati. L'integrazione non aggiunge ID o credenziali ai contatori sorgente.
+rifiutati. La verifica avviene già nel modulo iniziale e viene ripetuta durante
+il funzionamento. Sono rifiutati anche i contatori con fasce o consumo netto,
+le date senza fuso orario, gli inizi futuri e i reset diversi dalla mezzanotte
+del 1° gennaio. Un contatore in pausa rende indisponibile la stima finché riprende
+la raccolta. L'integrazione non aggiunge ID o credenziali ai contatori sorgente.
 
 ## Entità
 
@@ -75,7 +105,8 @@ rifiutati. L'integrazione non aggiunge ID o credenziali ai contatori sorgente.
 - Quota energia e quota servizi stimate
 - Contributo SSP stimato
 - Eccedenza economica stimata
-- Stato della stima, con fonte, anno, zona e copertura nelle proprietà
+- Stato della stima, con fonte, anno, provincia, zona e copertura nelle proprietà
+- Quattro sensori dei prezzi reali GME, indipendenti dalle ipotesi annuali
 
 Tutte le entità hanno ID univoci per configurazione e si aggiornano al cambio dei
 contatori. Gli importi non hanno `state_class: total_increasing`: aggiornare una
@@ -103,5 +134,8 @@ indirizzi di rete o credenziali. Gli esempi sono sintetici.
 - [Valore dell'energia immessa — GSE](https://assistenza.clienti.gse.it/csm/it/calcolo-valore-in-euro-energia-immessa-in-rete-scambio-sul-posto?id=faq&sys_id=38702e2fdbe888107a27e347489619ec)
 - [Regole tecniche GSE](https://www.gse.it/documenti_site/Documenti%20GSE/Servizi%20per%20te/SCAMBIO%20SUL%20POSTO/Regole%20e%20procedure/Regole%20Tecniche%20Scambio%20sul%20Posto_2019.pdf)
 - [Requisiti HACS](https://hacs.dev/docs/publish/integration/)
+- [Download prezzi MGP — GME](https://gme.mercatoelettrico.org/en-us/Home/Results/Electricity/MGP/Download?valore=Prezzi)
+- [Zone di mercato — ARERA](https://www.arera.it/fileadmin/allegati/eventi/230222Autoconsumo.pdf)
+- [Province e riordino della Sardegna — ISTAT](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/)
 
 Progetto della comunità, senza affiliazione a GSE, ARERA, GME o Home Assistant.
