@@ -33,6 +33,21 @@ for language, title, fields, errors, description in (
     description += " La zona di mercato è determinata dalla provincia selezionata." if language == "it" else " The market zone is determined by the selected province."
     value = {"title": title, "config": {"step": {"user": {"title": title, "description": description, "data": fields}}, "error": errors},
              "options": {"step": {"init": {"title": title, "description": description, "data": {key: text for key, text in fields.items() if key not in ("name", "import_energy", "export_energy")}}}, "error": errors}}
+    states = {
+        "reference_year_outdated": ("Parametri da aggiornare per l'anno corrente", "Update assumptions for the current year"),
+        "annual_counters_required": ("Servono contatori annuali validi", "Valid annual counters required"),
+        "energy_unavailable": ("Dati di energia non disponibili", "Energy data unavailable"),
+        "counter_paused": ("Contatore in pausa", "Counter paused"),
+        "periods_do_not_match": ("Periodi dei contatori non allineati", "Counter periods do not match"),
+        "rates_required": ("In attesa di prezzi medi e CUSf", "Average prices and CUSf required"),
+        "rate_reference_required": ("Indicare fonte e periodo dei parametri", "Parameter source and period required"),
+        "invalid_rates": ("Parametri economici non validi", "Invalid financial assumptions"),
+        "partial_year_estimate": ("Stima su periodo parziale", "Partial-year estimate"),
+        "annual_estimate": ("Stima annuale", "Annual estimate"),
+    }
+    value["entity"] = {"sensor": {"estimate_status": {"state": {
+        key: labels[0 if language == "it" else 1] for key, labels in states.items()
+    }}}}
     path = root / "translations" / f"{language}.json"
     path.parent.mkdir(exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 — prerelease
+
+- Installazione e aggiornamenti documentati tramite Marketplace di Home Assistant.
+- Stati della stima tradotti in italiano e inglese.
+- Esempio di dashboard collegata alle entità dell'integrazione, senza aiutanti economici legacy.
+- Indicazioni per il confronto con un prospetto GSE e per la corretta gestione delle unità.
+
 ## 0.2.0 — prerelease
 
 - Prezzi PUN e zonali reali GME del quarto d'ora corrente e medie giornaliere.

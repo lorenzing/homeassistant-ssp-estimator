@@ -1,0 +1,37 @@
+# Add this view to a dashboard; adapt entity IDs to the installed SSP entry.
+title: Scambio sul Posto
+path: scambio-sul-posto
+icon: mdi:transmission-tower-export
+cards:
+  - type: entities
+    title: Stima SSP del periodo
+    show_header_toggle: false
+    entities:
+      - sensor.ssp_stato_della_stima
+      - sensor.ssp_energia_scambiata_nel_periodo
+      - sensor.ssp_oe_stimato
+      - sensor.ssp_cei_stimato
+      - sensor.ssp_quota_energia_stimata
+      - sensor.ssp_quota_servizi_stimata
+      - sensor.ssp_contributo_ssp_stimato
+      - sensor.ssp_eccedenza_economica_stimata
+  - type: entities
+    title: Prezzi reali GME — EUR/kWh
+    show_header_toggle: false
+    entities:
+      - sensor.ssp_pun_puntuale
+      - sensor.ssp_prezzo_zonale_puntuale
+      - sensor.ssp_pun_medio_giornaliero
+      - sensor.ssp_prezzo_zonale_medio_giornaliero
+  - type: button
+    name: Configura provincia e parametri SSP
+    icon: mdi:cog
+    tap_action:
+      action: navigate
+      navigation_path: /config/integrations/integration/ssp_estimator
+  - type: markdown
+    content: >-
+      Stima del periodo, prima di costi amministrativi e fiscalità.
+      I prezzi puntuali e le medie giornaliere non sostituiscono le medie
+      ponderate sui flussi del periodo. Inserisci CUSf, anno e fonte da
+      Configura nell'integrazione. Gli importi non sono pagamenti GSE.

@@ -69,14 +69,17 @@ rimane disponibile con i parametri inseriti anche se il download GME fallisce.
 - I parametri devono essere riconfermati per il nuovo anno. Non c'è scraping
   fiscale o recupero automatico del CUSf, né una tariffa GSE fissa incorporata.
 
-## Installazione
+## Installazione e aggiornamenti dal Marketplace
 
-Repository prevista: `lorenzing/homeassistant-ssp-estimator`.
-L'inclusione nel catalogo HACS richiede una richiesta e una verifica separate.
+Repository: `lorenzing/homeassistant-ssp-estimator`.
+Su Home Assistant 2026.11 e successivi HACS è integrato nel **Marketplace**,
+raggiungibile da **Impostazioni → Marketplace**. Non installare il vecchio
+componente HACS su queste versioni. La repository deve essere pubblica.
 
-1. In HACS aggiungere l'URL della repository come repository personalizzata,
-   categoria **Integration**, e scaricarla. Per l'inclusione nel catalogo pubblico
-   HACS serve una procedura separata e l'accettazione dei manutentori.
+1. Nel Marketplace aggiungere `https://github.com/lorenzing/homeassistant-ssp-estimator`
+   alle repository personalizzate, categoria **Integration**, e installarla.
+   La presenza fra le repository personalizzate non equivale all'inclusione
+   nel catalogo pubblico, che richiede una procedura e una revisione separate.
 2. In alternativa copiare soltanto `custom_components/ssp_estimator` nella
    cartella `custom_components` dell'installazione Home Assistant.
 3. Riavviare Home Assistant. Versione minima: **2026.11.0**.
@@ -89,6 +92,23 @@ L'inclusione nel catalogo HACS richiede una richiesta e una verifica separate.
 6. Scegliere la provincia; impostare anno, medie PUN/prezzo zonale e CUSf, con fonte e periodo
    nel campo riferimento. Lasciare i valori economici non compilati se sconosciuti.
 7. Aggiornare le ipotesi da **Configura** nell'integrazione.
+
+Per una precedente installazione manuale della stessa integrazione, installare
+la repository dal Marketplace e riavviare, conservando la voce SSP già
+configurata. Non rimuoverla e non ricreare i contatori: gli ID univoci e lo
+storico dipendono dalla configurazione esistente. Gli aiutanti template di
+una vecchia implementazione separata vanno sostituiti nella dashboard con
+le entità dell'integrazione; i due contatori annuali restano le fonti.
+
+Le modifiche vengono pubblicate prima su GitHub e verificate dalla CI.
+Installare poi l'aggiornamento dal Marketplace o dalla relativa entità
+**Update**, riavviare quando richiesto e aggiornare infine la dashboard.
+In assenza di release, selezionare il branch `main`: gli aggiornamenti sono
+identificati dal commit. Non sovrascrivere manualmente i file gestiti dal Marketplace.
+
+Una vista essenziale è disponibile in [examples/ssp-dashboard.yaml](examples/ssp-dashboard.yaml).
+L'esempio presuppone una configurazione chiamata **SSP**; verificare gli ID
+reali, specialmente se erano già presenti aiutanti con lo stesso nome.
 
 Gli aiutanti annuali devono esporre `last_reset` nell'anno corrente e `next_reset`
 il 1° gennaio successivo. Contatori giornalieri/mensili o periodi disallineati sono
@@ -112,6 +132,28 @@ Tutte le entità hanno ID univoci per configurazione e si aggiornano al cambio d
 contatori. Gli importi non hanno `state_class: total_increasing`: aggiornare una
 media rivede l'intero scenario, non genera un nuovo pagamento. Non usarli come
 sensori di rimborso cumulativo nel pannello Energia.
+
+## Confrontare un prospetto GSE
+
+Il dettaglio GSE è un consuntivo storico, da tenere separato dalle ipotesi
+dell'anno corrente. Prima del confronto controllare anno, periodo e misure:
+
+- Il **CUS** può essere espresso in **cEuro/kWh**: per esempio 7,25 cEuro/kWh
+  corrispondono a 0,0725 EUR/kWh.
+- Per **OE**, sommare i valori mensili calcolati dalle misure per fascia;
+  il nome di una colonna non basta a stabilire l'unità, che va verificata
+  anche sulla formula numerica e sull'importo risultante.
+- Per **CEI**, il GSE può applicare un coefficiente alle immissioni nette.
+  Con contatori netti, la media effettiva per ricostruire CEI è
+  `CEI / kWh immessi netti`, comprensiva dell'eventuale coefficiente.
+  Applicarlo nuovamente a questa media conterebbe due volte la correzione.
+- L'eccedenza del solo anno è `max(CEI − OE, 0)`. Il credito accumulato può
+  includere importi di anni precedenti; la sua liquidabilità è distinta.
+- Il modello corrente non gestisce il recupero di crediti pregressi quando
+  OE supera CEI, né i movimenti di acconto, storno e costo amministrativo.
+
+Non trasferire automaticamente il CUS o le medie di un anno al successivo.
+I CSV GSE possono contenere POD e dati personali: non caricarli nella repository.
 
 ## Verifiche e sviluppo
 
@@ -143,6 +185,6 @@ indirizzi di rete o credenziali. Gli esempi sono sintetici.
 - [Download prezzi MGP — GME](https://gme.mercatoelettrico.org/en-us/Home/Results/Electricity/MGP/Download?valore=Prezzi)
 - [Zone di mercato — ARERA](https://www.arera.it/fileadmin/allegati/eventi/230222Autoconsumo.pdf)
 - [Province e riordino della Sardegna — ISTAT](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/)
+- [HACS e il Marketplace](https://www.hacs.xyz/docs/marketplace/)
 
 Progetto della comunità, senza affiliazione a GSE, ARERA, GME o Home Assistant.
-

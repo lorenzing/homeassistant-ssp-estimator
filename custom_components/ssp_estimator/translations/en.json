@@ -50,5 +50,23 @@
       "counter_paused": "The counter is paused. Resume collection before configuring the estimate.",
       "periods_do_not_match": "Both counters must cover the same period (five-minute tolerance)."
     }
+  },
+  "entity": {
+    "sensor": {
+      "estimate_status": {
+        "state": {
+          "reference_year_outdated": "Update assumptions for the current year",
+          "annual_counters_required": "Valid annual counters required",
+          "energy_unavailable": "Energy data unavailable",
+          "counter_paused": "Counter paused",
+          "periods_do_not_match": "Counter periods do not match",
+          "rates_required": "Average prices and CUSf required",
+          "rate_reference_required": "Parameter source and period required",
+          "invalid_rates": "Invalid financial assumptions",
+          "partial_year_estimate": "Partial-year estimate",
+          "annual_estimate": "Annual estimate"
+        }
+      }
+    }
   }
 }

@@ -9,7 +9,7 @@ from homeassistant.helpers.event import async_track_state_change_event, async_tr
 from homeassistant.util import dt as dt_util
 
 from .calculation import estimate, number
-from .const import DOMAIN, EXPORT, IMPORT, RATES
+from .const import DOMAIN, EXPORT, IMPORT, RATES, ESTIMATE_STATUSES
 from .period import InvalidCounter, read_counter
 
 DESCRIPTIONS = (
@@ -52,6 +52,10 @@ class SSPSensor(SensorEntity):
         self._attr_native_unit_of_measurement = unit
         self._attr_suggested_display_precision = 3 if unit == "kWh" else 2 if unit else None
         self._attr_device_class = SensorDeviceClass.ENERGY if unit == "kWh" else SensorDeviceClass.MONETARY if unit else None
+        if key == "status":
+            self._attr_device_class = SensorDeviceClass.ENUM
+            self._attr_options = list(ESTIMATE_STATUSES)
+            self._attr_translation_key = "estimate_status"
         self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, entry.entry_id)}, name=entry.title, manufacturer="Community", model="SSP annual estimate")
 
     async def async_added_to_hass(self):

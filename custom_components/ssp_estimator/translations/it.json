@@ -50,5 +50,23 @@
       "counter_paused": "Il contatore è in pausa. Riprendi il conteggio prima di configurare la stima.",
       "periods_do_not_match": "I due contatori devono coprire lo stesso periodo (tolleranza di cinque minuti)."
     }
+  },
+  "entity": {
+    "sensor": {
+      "estimate_status": {
+        "state": {
+          "reference_year_outdated": "Parametri da aggiornare per l'anno corrente",
+          "annual_counters_required": "Servono contatori annuali validi",
+          "energy_unavailable": "Dati di energia non disponibili",
+          "counter_paused": "Contatore in pausa",
+          "periods_do_not_match": "Periodi dei contatori non allineati",
+          "rates_required": "In attesa di prezzi medi e CUSf",
+          "rate_reference_required": "Indicare fonte e periodo dei parametri",
+          "invalid_rates": "Parametri economici non validi",
+          "partial_year_estimate": "Stima su periodo parziale",
+          "annual_estimate": "Stima annuale"
+        }
+      }
+    }
   }
 }

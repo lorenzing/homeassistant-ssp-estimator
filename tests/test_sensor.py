@@ -16,7 +16,7 @@ def load_adapter():
                  "homeassistant.helpers.event", "homeassistant.util", "homeassistant.util.dt"):
         modules[name] = ModuleType(name)
     modules["homeassistant.components.sensor"].SensorEntity = type("SensorEntity", (), {})
-    modules["homeassistant.components.sensor"].SensorDeviceClass = SimpleNamespace(ENERGY="energy", MONETARY="monetary")
+    modules["homeassistant.components.sensor"].SensorDeviceClass = SimpleNamespace(ENERGY="energy", MONETARY="monetary", ENUM="enum")
     modules["homeassistant.config_entries"].ConfigEntry = object
     modules["homeassistant.core"].HomeAssistant = object
     modules["homeassistant.core"].callback = lambda function: function
