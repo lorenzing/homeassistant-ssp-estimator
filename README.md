@@ -122,8 +122,14 @@ python -m compileall -q custom_components
 
 I test del calcolo non richiedono Home Assistant. La suite di adattamento dei
 sensori usa piccoli sostituti delle API per verificare periodi, disponibilità e
-unità; non sostituisce una prova completa dentro Home Assistant. La pubblicazione
-iniziale resta prerelease fino alla verifica reale dell'integrazione installata.
+unità. La CI esegue inoltre due prove del modulo di configurazione con i
+selettori reali di Home Assistant 2026.11.2 (`tests_ha`), installato su Python
+3.14. Queste prove controllano apertura del setup e precisione dei prezzi.
+
+La versione 0.2.0 è stata anche installata e configurata su Home Assistant
+2026.11.2: verificati setup e opzioni per provincia, download GME e disponibilità
+dei quattro sensori di mercato. Resta prerelease: non è stata completata la
+validazione HACS/Hassfest né una verifica annuale con i conguagli GSE.
 
 La repository non deve contenere esportazioni dell'impianto, token, POD,
 indirizzi di rete o credenziali. Gli esempi sono sintetici.
@@ -139,3 +145,4 @@ indirizzi di rete o credenziali. Gli esempi sono sintetici.
 - [Province e riordino della Sardegna — ISTAT](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/)
 
 Progetto della comunità, senza affiliazione a GSE, ARERA, GME o Home Assistant.
+
