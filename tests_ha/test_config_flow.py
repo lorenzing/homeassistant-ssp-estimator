@@ -20,6 +20,16 @@ class ConfigurationSchemaTests(unittest.TestCase):
                     "pun_average": 0.123456, "rate_reference": "Synthetic assumptions"}
         self.assertEqual(_schema(defaults)({})["pun_average"], 0.123456)
 
+    def test_automatic_options_need_no_manual_energy_prices(self):
+        result = _schema({"province": "Ferrara", "reference_year": 2026})({})
+        self.assertEqual(result["energy_price_mode"], "automatic")
+        self.assertNotIn("pun_average", result)
+        self.assertNotIn("cusf", result)
+
+    def test_existing_manual_configuration_remains_manual(self):
+        result = _schema({"province": "Roma", "pun_average": 0.123456})({})
+        self.assertEqual(result["energy_price_mode"], "manual")
+
 
 if __name__ == "__main__":
     unittest.main()

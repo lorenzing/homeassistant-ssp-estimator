@@ -44,11 +44,38 @@ di validità e ultimo download. I giorni di cambio dell'ora hanno 92 o 100
 quarti d'ora. Mancanze e errori non vengono sostituiti da prezzi inventati o
 da quelli del giorno precedente; le medie richiedono il giorno completo.
 
-Questi prezzi **non sostituiscono automaticamente le medie ponderate annuali**:
-per calcolare OE e CEI del periodo occorre ponderarli sui rispettivi flussi.
+Il prezzo puntuale **non viene applicato a tutti i kWh del periodo**:
+per calcolare OE e CEI occorre abbinarlo ai rispettivi flussi storici.
 Il CUSf resta un parametro distinto da inserire con fonte e anno coerenti;
-non è un prezzo di borsa e non viene ricavato dal PUN. Il calcolo annuale
+non è un prezzo di borsa e non viene ricavato dal PUN. Il calcolo manuale
 rimane disponibile con i parametri inseriti anche se il download GME fallisce.
+
+## Valorizzazione automatica del periodo
+
+Da 0.3.0 la modalità **Automatica** legge le variazioni orarie dei due contatori
+da Recorder e le abbina ai prezzi GME delle stesse ore. Gli archivi storici
+dei prezzi vengono scaricati in intervalli brevi e conservati nella cartella
+locale `.storage`; le misure dell'impianto non sono inviate al GME.
+
+L'aggiornamento avviene ogni 15 minuti e copre soltanto ore completamente
+registrate. Negli attributi sono indicati inizio/fine, ore e kWh valorizzati.
+L'energia scambiata in tempo reale può essere più recente dell'ultimo importo.
+Ore senza misure o prezzi non sono valorizzate con zeri o prezzi di oggi.
+
+Il modello usa la media dei quattro prezzi di ogni ora, ponderata sui kWh
+registrati in quell'ora: **è un'approssimazione oraria**, perché le statistiche
+orarie non descrivono la distribuzione dell'energia fra i quattro quarti.
+CEI è valorizzato sui kWh netti registrati, con coefficiente 1; il conguaglio
+GSE può applicare correzioni e misure validate diverse.
+
+**OE, CEI, quota energia ed eccedenza non richiedono il CUSf**. Solo quota
+servizi e contributo complessivo restano indisponibili finché mancano CUSf e
+relativa fonte. Nella modalità manuale ogni importo viene reso disponibile
+appena sono presenti i suoi parametri, senza bloccare gli altri importi.
+
+Le configurazioni con medie manuali già inserite mantengono quella modalità;
+quelle senza medie passano automaticamente alla valorizzazione da storico.
+La modalità si può cambiare da **Configura**, insieme alla provincia.
 
 ### Limiti del modello
 
@@ -64,8 +91,8 @@ rimane disponibile con i parametri inseriti anche se il download GME fallisce.
   Non è una seconda remunerazione da aggiungere due volte a CEI.
 - Il GSE usa misure validate dal distributore; i contatori di un inverter possono
   differire. Un periodo iniziato durante l'anno viene segnalato come parziale.
-- La prima versione non ricostruisce il passato e non modifica contatori o
-  configurazione Energia. Gli importi sono indisponibili senza parametri e fonte.
+- La modalità automatica ricostruisce solo il periodo coperto da statistiche
+  orarie complete dei contatori selezionati; non modifica contatori o pannello Energia.
 - I parametri devono essere riconfermati per il nuovo anno. Non c'è scraping
   fiscale o recupero automatico del CUSf, né una tariffa GSE fissa incorporata.
 
@@ -89,8 +116,9 @@ componente HACS su queste versioni. La repository deve essere pubblica.
    l'opzione "Periodicamente azzerato". Creare entrambi nello stesso momento.
 5. Aggiungere l'integrazione **Scambio sul Posto — Stima GSE** e scegliere i due
    nuovi contatori annuali. Non selezionare i totali vita dell'inverter.
-6. Scegliere la provincia; impostare anno, medie PUN/prezzo zonale e CUSf, con fonte e periodo
-   nel campo riferimento. Lasciare i valori economici non compilati se sconosciuti.
+6. Scegliere provincia, anno e modalità. In automatico le medie energia manuali
+   non servono; in manuale inserirle con fonte e periodo. Inserire CUSf e fonte
+   separatamente; lasciare il campo vuoto se sconosciuto.
 7. Aggiornare le ipotesi da **Configura** nell'integrazione.
 
 Per una precedente installazione manuale della stessa integrazione, installare

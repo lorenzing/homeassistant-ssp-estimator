@@ -71,7 +71,54 @@ class SensorTests(unittest.TestCase):
         del self.options["cusf"]
         self.assertFalse(self.sensor.available)
         self.assertIsNone(self.sensor.native_value)
-        self.assertEqual(self.sensor._result()[0], "rates_required")
+        self.assertEqual(self.sensor._result()[0], "cusf_required")
+
+    def test_missing_cusf_keeps_energy_amounts_available(self):
+        self.options.pop("cusf")
+        for key, expected in (("oe", 360), ("cei", 200), ("energy_component", 200), ("economic_surplus", 0)):
+            with self.subTest(key=key):
+                self.sensor.key = key
+                self.assertTrue(self.sensor.available)
+                self.assertEqual(self.sensor.native_value, expected)
+
+    def test_services_do_not_need_energy_prices(self):
+        self.options.pop("pun_average")
+        self.options.pop("zonal_average")
+        self.options["energy_price_mode"] = "manual"
+        self.sensor.key = "services_component"
+        self.assertTrue(self.sensor.available)
+        self.assertEqual(self.sensor.native_value, 120)
+        self.sensor.key = "oe"
+        self.assertFalse(self.sensor.available)
+
+    def test_only_one_manual_price_is_required_for_its_amount(self):
+        self.options.pop("zonal_average")
+        self.sensor.key = "oe"
+        self.assertEqual(self.sensor.native_value, 360)
+        self.assertTrue(self.sensor.available)
+        self.sensor.key = "cei"
+        self.assertFalse(self.sensor.available)
+
+    def test_automatic_energy_is_independent_of_cusf(self):
+        self.options["energy_price_mode"] = "automatic"
+        self.options.pop("cusf")
+        self.options["rate_reference"] = ""
+        self.sensor.hass.data = {"ssp_estimator": {"test": SimpleNamespace(valuation=SimpleNamespace(
+            last_update_success=True, data={"oe": 12, "cei": 8, "exchanged_kwh": 20,
+                "priced_period_start": "2025-12-31T23:00:00+00:00"}))}}
+        self.sensor.key = "oe"
+        self.assertTrue(self.sensor.available)
+        self.assertEqual(self.sensor.native_value, 12)
+        self.assertEqual(self.sensor._result()[0], "cusf_required")
+        self.sensor.key = "contribution"
+        self.assertFalse(self.sensor.available)
+
+    def test_automatic_cannot_reuse_previous_reset_period(self):
+        self.test_automatic_energy_is_independent_of_cusf()
+        self.sensor.hass.data["ssp_estimator"]["test"].valuation.data["priced_period_start"] = "2025-01-01T00:00:00+00:00"
+        self.sensor.key = "oe"
+        self.assertFalse(self.sensor.available)
+        self.assertEqual(self.sensor._result()[0], "hourly_valuation_unavailable")
 
     def test_year_rollover_requires_new_assumptions(self):
         self.options["reference_year"] = 2025

@@ -14,7 +14,9 @@
           "zonal_average": "Prezzo zonale medio ponderato sulle immissioni (€/kWh)",
           "cusf": "CUSf di riferimento (€/kWh)",
           "rate_reference": "Fonte, periodo e ipotesi dei parametri",
-          "province": "Provincia dell'impianto (zona di mercato automatica)"
+          "province": "Provincia dell'impianto (zona di mercato automatica)",
+          "energy_price_mode": "Calcolo energia: automatico da storico GME o medie manuali",
+          "cusf_reference": "Fonte e anno del CUSf (separati dai prezzi energia)"
         }
       }
     },
@@ -38,7 +40,9 @@
           "zonal_average": "Prezzo zonale medio ponderato sulle immissioni (€/kWh)",
           "cusf": "CUSf di riferimento (€/kWh)",
           "rate_reference": "Fonte, periodo e ipotesi dei parametri",
-          "province": "Provincia dell'impianto (zona di mercato automatica)"
+          "province": "Provincia dell'impianto (zona di mercato automatica)",
+          "energy_price_mode": "Calcolo energia: automatico da storico GME o medie manuali",
+          "cusf_reference": "Fonte e anno del CUSf (separati dai prezzi energia)"
         }
       }
     },
@@ -61,11 +65,21 @@
           "counter_paused": "Contatore in pausa",
           "periods_do_not_match": "Periodi dei contatori non allineati",
           "rates_required": "In attesa di prezzi medi e CUSf",
+          "cusf_required": "Energia valorizzata; manca il CUSf per servizi e contributo",
+          "hourly_valuation_unavailable": "In attesa dello storico orario energia/prezzi",
           "rate_reference_required": "Indicare fonte e periodo dei parametri",
           "invalid_rates": "Parametri economici non validi",
           "partial_year_estimate": "Stima su periodo parziale",
           "annual_estimate": "Stima annuale"
         }
+      }
+    }
+  },
+  "selector": {
+    "energy_price_mode": {
+      "options": {
+        "automatic": "Automatico: energia oraria e prezzi GME reali",
+        "manual": "Manuale: medie ponderate del periodo"
       }
     }
   }

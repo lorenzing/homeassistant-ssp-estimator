@@ -8,7 +8,7 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN, EXPORT, IMPORT, RATES
+from .const import DOMAIN, EXPORT, IMPORT, RATES, price_mode
 from .period import InvalidCounter, read_counter
 from .provinces import PROVINCE_ZONES, province_options, with_province_zone
 
@@ -29,12 +29,16 @@ def _schema(defaults: dict, *, user: bool = False) -> vol.Schema:
     fields[vol.Required("reference_year", default=defaults.get("reference_year", dt_util.now().year))] = selector.NumberSelector(
         selector.NumberSelectorConfig(min=2000, max=2100, step=1, mode="box")
     )
+    fields[vol.Required("energy_price_mode", default=price_mode(defaults))] = selector.SelectSelector(
+        selector.SelectSelectorConfig(options=["automatic", "manual"], mode="dropdown", translation_key="energy_price_mode")
+    )
     for key in RATES:
         marker = vol.Optional(key, default=defaults[key]) if key in defaults else vol.Optional(key)
         fields[marker] = selector.NumberSelector(selector.NumberSelectorConfig(
             min=0 if key == "cusf" else -2, max=5, step="any", mode="box", unit_of_measurement="EUR/kWh"
         ))
     fields[vol.Optional("rate_reference", default=defaults.get("rate_reference", ""))] = selector.TextSelector()
+    fields[vol.Optional("cusf_reference", default=defaults.get("cusf_reference", ""))] = selector.TextSelector()
     return vol.Schema(fields)
 
 

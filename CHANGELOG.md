@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — prerelease
+
+- Valorizzazione automatica delle ore registrate con prezzi GME dello stesso periodo.
+- Cache locale dei prezzi storici e copertura temporale esplicita negli attributi.
+- OE, CEI, quota energia ed eccedenza disponibili anche senza CUSf.
+- In manuale, disponibilità indipendente degli importi secondo i parametri richiesti.
+- Selezione fra modalità automatica e manuale, con fonte CUSf separata.
+- Nessuna sostituzione delle ore mancanti con zeri o prezzi attuali.
+
 ## 0.2.1 — prerelease
 
 - Installazione e aggiornamenti documentati tramite Marketplace di Home Assistant.

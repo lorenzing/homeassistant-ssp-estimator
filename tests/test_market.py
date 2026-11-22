@@ -17,6 +17,7 @@ market = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = market
 spec.loader.exec_module(market)
 from ssp_market_tests.provinces import PROVINCE_ZONES, province_options, with_province_zone
+from ssp_market_tests.valuation import value_hours
 
 
 def archive(day="20261122", count=96, pun="200,000000", zonal="180,000000"):
@@ -86,6 +87,50 @@ class ProvinceTests(unittest.TestCase):
                                "Gallura Nord-Est Sardegna": "SARD"}.items():
             with self.subTest(province=province):
                 self.assertEqual(with_province_zone({"province": province, "zone": "wrong"})["zone"], zone)
+
+
+class HourlyValuationTests(unittest.TestCase):
+    def setUp(self):
+        self.start = datetime(2026, 11, 10, 8, tzinfo=timezone.utc)
+        self.end = self.start + timedelta(hours=2)
+        self.slots = [market.PriceSlot(self.start + timedelta(minutes=15 * index),
+                                      self.start + timedelta(minutes=15 * (index + 1)),
+                                      0.1 if index < 4 else 0.3,
+                                      0.05 if index < 4 else 0.15) for index in range(8)]
+        self.imports = [{"start": self.start.timestamp(), "change": 10},
+                        {"start": (self.start + timedelta(hours=1)).timestamp(), "change": 30}]
+        self.exports = [{"start": row["start"], "change": row["change"] / 10} for row in self.imports]
+
+    def test_weights_each_flow_with_the_price_of_the_same_hour(self):
+        result = value_hours(self.imports, self.exports, self.slots, self.start, self.end)
+        self.assertEqual(result["oe"], 10)
+        self.assertAlmostEqual(result["cei"], 0.5)
+        self.assertEqual(result["imported_kwh"], 40)
+        self.assertEqual(result["exchanged_kwh"], 4)
+        self.assertTrue(result["within_hour_profile_unknown"])
+
+    def test_missing_price_is_not_replaced_with_zero(self):
+        with self.assertRaises(ValueError):
+            value_hours(self.imports, self.exports, self.slots[:-1], self.start, self.end)
+
+    def test_missing_energy_is_not_replaced_with_zero(self):
+        with self.assertRaises(ValueError):
+            value_hours(self.imports[:-1], self.exports, self.slots, self.start, self.end)
+
+    def test_negative_correction_is_not_counted_as_income(self):
+        self.imports[0]["change"] = -1
+        with self.assertRaises(ValueError):
+            value_hours(self.imports, self.exports, self.slots, self.start, self.end)
+
+    def test_duplicate_intervals_are_rejected(self):
+        with self.assertRaises(ValueError):
+            value_hours(self.imports + self.imports[:1], self.exports, self.slots, self.start, self.end)
+
+    def test_first_hour_can_start_at_meter_creation(self):
+        result = value_hours(self.imports, self.exports, self.slots,
+                             self.start + timedelta(minutes=12), self.end)
+        self.assertEqual(result["oe"], 10)
+        self.assertEqual(result["priced_period_start"], (self.start + timedelta(minutes=12)).isoformat())
 
 
 if __name__ == "__main__":

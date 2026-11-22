@@ -30,6 +30,8 @@ for language, title, fields, errors, description in (
     })
     fields.pop("zone")
     fields["province"] = "Provincia dell'impianto (zona di mercato automatica)" if language == "it" else "Installation province (automatic market zone)"
+    fields["energy_price_mode"] = "Calcolo energia: automatico da storico GME o medie manuali" if language == "it" else "Energy valuation: automatic GME history or manual averages"
+    fields["cusf_reference"] = "Fonte e anno del CUSf (separati dai prezzi energia)" if language == "it" else "CUSf source and year (separate from energy prices)"
     description += " La zona di mercato è determinata dalla provincia selezionata." if language == "it" else " The market zone is determined by the selected province."
     value = {"title": title, "config": {"step": {"user": {"title": title, "description": description, "data": fields}}, "error": errors},
              "options": {"step": {"init": {"title": title, "description": description, "data": {key: text for key, text in fields.items() if key not in ("name", "import_energy", "export_energy")}}}, "error": errors}}
@@ -40,6 +42,8 @@ for language, title, fields, errors, description in (
         "counter_paused": ("Contatore in pausa", "Counter paused"),
         "periods_do_not_match": ("Periodi dei contatori non allineati", "Counter periods do not match"),
         "rates_required": ("In attesa di prezzi medi e CUSf", "Average prices and CUSf required"),
+        "cusf_required": ("Energia valorizzata; manca il CUSf per servizi e contributo", "Energy valued; CUSf required for services and total"),
+        "hourly_valuation_unavailable": ("In attesa dello storico orario energia/prezzi", "Waiting for hourly energy and price history"),
         "rate_reference_required": ("Indicare fonte e periodo dei parametri", "Parameter source and period required"),
         "invalid_rates": ("Parametri economici non validi", "Invalid financial assumptions"),
         "partial_year_estimate": ("Stima su periodo parziale", "Partial-year estimate"),
@@ -48,6 +52,10 @@ for language, title, fields, errors, description in (
     value["entity"] = {"sensor": {"estimate_status": {"state": {
         key: labels[0 if language == "it" else 1] for key, labels in states.items()
     }}}}
+    value["selector"] = {"energy_price_mode": {"options": {
+        "automatic": "Automatico: energia oraria e prezzi GME reali" if language == "it" else "Automatic: hourly energy and real GME prices",
+        "manual": "Manuale: medie ponderate del periodo" if language == "it" else "Manual: period-weighted averages",
+    }}}
     path = root / "translations" / f"{language}.json"
     path.parent.mkdir(exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

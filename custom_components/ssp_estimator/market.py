@@ -33,7 +33,7 @@ def parse_prices(payload: bytes, zone: str) -> list[PriceSlot]:
     slots = {}
     with ZipFile(BytesIO(payload)) as archive:
         files = archive.infolist()
-        if len(files) > 8 or sum(item.file_size for item in files) > 4_000_000:
+        if len(files) > 64 or sum(item.file_size for item in files) > 16_000_000:
             raise ValueError("Unexpected archive size")
         for item in files:
             if not item.filename.lower().endswith(".xml"):

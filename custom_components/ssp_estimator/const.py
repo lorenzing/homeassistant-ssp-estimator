@@ -9,4 +9,10 @@ ESTIMATE_STATUSES = (
     "reference_year_outdated", "annual_counters_required", "energy_unavailable",
     "counter_paused", "periods_do_not_match", "rates_required",
     "rate_reference_required", "invalid_rates", "partial_year_estimate", "annual_estimate",
+    "cusf_required", "hourly_valuation_unavailable",
 )
+
+
+def price_mode(config):
+    """Preserve previously supplied manual averages; otherwise use real history."""
+    return config.get("energy_price_mode", "manual" if any(key in config for key in RATES[:2]) else "automatic")

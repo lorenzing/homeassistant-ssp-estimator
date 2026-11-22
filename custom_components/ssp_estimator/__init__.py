@@ -6,16 +6,19 @@ from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 from .coordinator import MarketCoordinator
+from .valuation_coordinator import ValuationCoordinator
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up sensors; configuration is stored by Home Assistant."""
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
     coordinator = MarketCoordinator(hass, entry)
+    coordinator.valuation = ValuationCoordinator(hass, entry, coordinator)
     # A market outage must not prevent the independent annual estimate loading.
     await coordinator.async_refresh()
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
+    entry.async_create_background_task(hass, coordinator.valuation.async_refresh(), "SSP hourly valuation")
     return True
 
 

@@ -14,7 +14,9 @@
           "zonal_average": "Export-weighted zonal price average (EUR/kWh)",
           "cusf": "Reference CUSf (EUR/kWh)",
           "rate_reference": "Parameter source, period and assumptions",
-          "province": "Installation province (automatic market zone)"
+          "province": "Installation province (automatic market zone)",
+          "energy_price_mode": "Energy valuation: automatic GME history or manual averages",
+          "cusf_reference": "CUSf source and year (separate from energy prices)"
         }
       }
     },
@@ -38,7 +40,9 @@
           "zonal_average": "Export-weighted zonal price average (EUR/kWh)",
           "cusf": "Reference CUSf (EUR/kWh)",
           "rate_reference": "Parameter source, period and assumptions",
-          "province": "Installation province (automatic market zone)"
+          "province": "Installation province (automatic market zone)",
+          "energy_price_mode": "Energy valuation: automatic GME history or manual averages",
+          "cusf_reference": "CUSf source and year (separate from energy prices)"
         }
       }
     },
@@ -61,11 +65,21 @@
           "counter_paused": "Counter paused",
           "periods_do_not_match": "Counter periods do not match",
           "rates_required": "Average prices and CUSf required",
+          "cusf_required": "Energy valued; CUSf required for services and total",
+          "hourly_valuation_unavailable": "Waiting for hourly energy and price history",
           "rate_reference_required": "Parameter source and period required",
           "invalid_rates": "Invalid financial assumptions",
           "partial_year_estimate": "Partial-year estimate",
           "annual_estimate": "Annual estimate"
         }
+      }
+    }
+  },
+  "selector": {
+    "energy_price_mode": {
+      "options": {
+        "automatic": "Automatic: hourly energy and real GME prices",
+        "manual": "Manual: period-weighted averages"
       }
     }
   }
